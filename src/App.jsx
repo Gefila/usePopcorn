@@ -49,18 +49,25 @@ export default function App() {
 	const [movies, setMovies] = useState(tempMovieData);
 	return (
 		<>
-			<NavBar movies={movies}/>
-			<Main movies={movies}/>
+			<NavBar>
+				<Search />
+				<NumResults movies={movies} />
+			</NavBar>
+			<Main>
+				<ListBox >
+					<MovieList movies={movies} />
+				</ListBox>
+				<WatchedBox />
+			</Main>
 		</>
 	);
 }
 
-function NavBar({movies}) {
+function NavBar({ children }) {
 	return (
 		<nav className="nav-bar">
 			<Logo />
-			<Search />
-			<NumResults movies={movies}/>
+			{children}
 		</nav>
 	);
 }
@@ -74,7 +81,7 @@ function Logo() {
 	);
 }
 
-function NumResults({movies}) {
+function NumResults({ movies }) {
 	return (
 		<p className="num-results">
 			Found <strong>{movies.length}</strong> results
@@ -95,16 +102,11 @@ function Search() {
 	);
 }
 
-function Main({movies}) {
-	return (
-		<main className="main">
-			<ListBox movies={movies}/>
-			<WatchedBox />
-		</main>
-	);
+function Main({ children }) {
+	return <main className="main">{children}</main>;
 }
 
-function ListBox({movies}) {
+function ListBox({ children }) {
 	const [isOpen1, setIsOpen1] = useState(true);
 	return (
 		<div className="box">
@@ -114,34 +116,34 @@ function ListBox({movies}) {
 			>
 				{isOpen1 ? "–" : "+"}
 			</button>
-			{isOpen1 && <MovieList movies={movies}/>}
+			{isOpen1 && children}
 		</div>
 	);
 }
 
-function MovieList({movies}) {
+function MovieList({ movies }) {
 	return (
 		<ul className="list">
 			{movies?.map((movie) => (
-				<Movie movie={movie} key={movie}/>
+				<Movie movie={movie} key={movie} />
 			))}
 		</ul>
 	);
 }
 
-function Movie({movie}){
-	return(
+function Movie({ movie }) {
+	return (
 		<li key={movie.imdbID}>
-		<img src={movie.Poster} alt={`${movie.Title} poster`} />
-		<h3>{movie.Title}</h3>
-		<div>
-			<p>
-				<span>🗓</span>
-				<span>{movie.Year}</span>
-			</p>
-		</div>
-	</li>
-	)
+			<img src={movie.Poster} alt={`${movie.Title} poster`} />
+			<h3>{movie.Title}</h3>
+			<div>
+				<p>
+					<span>🗓</span>
+					<span>{movie.Year}</span>
+				</p>
+			</div>
+		</li>
+	);
 }
 
 function WatchedBox() {
@@ -160,59 +162,55 @@ function WatchedBox() {
 				<>
 					<WatchedSummary watched={watched} />
 					<WatchedMoviesList watched={watched} />
-
 				</>
 			)}
 		</div>
 	);
 }
 
-function WatchedSummary({watched}) {
+function WatchedSummary({ watched }) {
 	const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
 	const avgUserRating = average(watched.map((movie) => movie.userRating));
 	const avgRuntime = average(watched.map((movie) => movie.runtime));
-	return(
+	return (
 		<div className="summary">
-		<h2>Movies you watched</h2>
-		<div>
-			<p>
-				<span>#️⃣</span>
-				<span>{watched.length} movies</span>
-			</p>
-			<p>
-				<span>⭐️</span>
-				<span>{avgImdbRating}</span>
-			</p>
-			<p>
-				<span>🌟</span>
-				<span>{avgUserRating}</span>
-			</p>
-			<p>
-				<span>⏳</span>
-				<span>{avgRuntime} min</span>
-			</p>
+			<h2>Movies you watched</h2>
+			<div>
+				<p>
+					<span>#️⃣</span>
+					<span>{watched.length} movies</span>
+				</p>
+				<p>
+					<span>⭐️</span>
+					<span>{avgImdbRating}</span>
+				</p>
+				<p>
+					<span>🌟</span>
+					<span>{avgUserRating}</span>
+				</p>
+				<p>
+					<span>⏳</span>
+					<span>{avgRuntime} min</span>
+				</p>
+			</div>
 		</div>
-	</div>
-	)
+	);
 }
 
-function WatchedMoviesList({watched}){
-	return(
+function WatchedMoviesList({ watched }) {
+	return (
 		<ul className="list">
-		{watched.map((movie) => (
-			<WatchedMovie movie={movie} key={movie.imdbID}/>
-		))}
-	</ul>
-	)
+			{watched.map((movie) => (
+				<WatchedMovie movie={movie} key={movie.imdbID} />
+			))}
+		</ul>
+	);
 }
 
-function WatchedMovie({movie}){
-	return(
+function WatchedMovie({ movie }) {
+	return (
 		<li key={movie.imdbID}>
-			<img
-				src={movie.Poster}
-				alt={`${movie.Title} poster`}
-			/>
+			<img src={movie.Poster} alt={`${movie.Title} poster`} />
 			<h3>{movie.Title}</h3>
 			<div>
 				<p>
@@ -229,5 +227,5 @@ function WatchedMovie({movie}){
 				</p>
 			</div>
 		</li>
-	)
+	);
 }
