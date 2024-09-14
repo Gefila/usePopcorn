@@ -5,7 +5,7 @@ const average = (arr) =>
 	arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 export default function App() {
-	const [query, setQuery] = useState("batman");
+	const [query, setQuery] = useState("");
 	const [movies, setMovies] = useState([]);
 	const [watched, setWatched] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
@@ -51,6 +51,7 @@ export default function App() {
 			return;
 		}
 
+		handleCloseMovie();
 		fetchMovies();
 
 		return () => {
@@ -220,6 +221,19 @@ function MovieDetails({
 			document.title = "usePopcorn";
 		};
 	}, [movie]);
+
+	useEffect(() => {
+		function callback(e) {
+			if (e.key === "Escape") {
+				onCloseMovie();
+			}
+		}
+		document.addEventListener("keydown", callback);
+
+		return () => {
+			document.removeEventListener("keydown", callback);
+		};
+	}, [onCloseMovie]);
 
 	const {
 		Title: title,
