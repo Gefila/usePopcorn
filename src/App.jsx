@@ -204,6 +204,11 @@ function MovieDetails({
 		getMovieDetails();
 	}, [selectedId]);
 
+	useEffect(() => {
+		if (!movie.Title) return;
+		document.title = `Movie | ${movie.Title}`;
+	}, [movie]);
+
 	const {
 		Title: title,
 		Year: year,
