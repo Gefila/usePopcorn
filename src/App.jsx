@@ -13,6 +13,7 @@ export default function App() {
 	const [selectedId, setSelectedId] = useState(null);
 
 	useEffect(() => {
+		const controller = new AbortController();
 		async function fetchMovies() {
 			try {
 				setError("");
@@ -20,7 +21,8 @@ export default function App() {
 				const res = await fetch(
 					`http://www.omdbapi.com/?apikey=${
 						import.meta.env.VITE_API_KEY
-					}&s=${query}`
+					}&s=${query}`,
+					{ signal: controller.signal }
 				);
 				if (!res.ok)
 					throw new Error(
@@ -32,9 +34,12 @@ export default function App() {
 					throw new Error("Movie not found");
 
 				setMovies(data.Search);
+				setError("");
 			} catch (error) {
 				setMovies([]);
-				setError(error.message);
+				if (error.name !== "AbortError") {
+					setError(error.message);
+				}
 			} finally {
 				setIsLoading(false);
 			}
@@ -47,6 +52,10 @@ export default function App() {
 		}
 
 		fetchMovies();
+
+		return () => {
+			controller.abort();
+		};
 	}, [query]);
 
 	function handleSelectMovie(id) {
