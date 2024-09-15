@@ -17,7 +17,10 @@ export const average = (arr) =>
 export default function App() {
 	const [query, setQuery] = useState("");
 	const [movies, setMovies] = useState([]);
-	const [watched, setWatched] = useState([]);
+	const [watched, setWatched] = useState(()=>{
+		const watched = localStorage.getItem("watched");
+		return watched ? JSON.parse(watched) : [];
+	});
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [selectedId, setSelectedId] = useState(null);
@@ -68,6 +71,10 @@ export default function App() {
 			controller.abort();
 		};
 	}, [query]);
+
+	useEffect(()=> {
+		localStorage.setItem("watched", JSON.stringify(watched));
+	}, [watched]);
 
 	function handleSelectMovie(id) {
 		setSelectedId((prevId) => (prevId === id ? null : id));
