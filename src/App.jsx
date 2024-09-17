@@ -11,23 +11,16 @@ import MovieList from "./components/MovieList";
 import WatchedSummary from "./components/WatchedSummary";
 import WatchedMoviesList from "./components/WatchedMoviesList";
 import { useMovie } from "./useMovie";
+import { useLocalStorageState } from "./useLocalStorageState";
 
 export const average = (arr) =>
 	arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 export default function App() {
 	const [query, setQuery] = useState("");
-	const [watched, setWatched] = useState(() => {
-		const watched = localStorage.getItem("watched");
-		return watched ? JSON.parse(watched) : [];
-	});
 	const [selectedId, setSelectedId] = useState(null);
-
 	const { movies, isLoading, error } = useMovie(query);
-
-	useEffect(() => {
-		localStorage.setItem("watched", JSON.stringify(watched));
-	}, [watched]);
+	const [watched, setWatched] = useLocalStorageState([], "watched");
 
 	function handleSelectMovie(id) {
 		setSelectedId((prevId) => (prevId === id ? null : id));
