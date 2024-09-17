@@ -1,9 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Loader from "./Loader";
 import StarRating from "./StarRating";
 
 export default function MovieDetails({
-	selectedId, onCloseMovie, onAddWatchedMovie, watched,
+	selectedId,
+	onCloseMovie,
+	onAddWatchedMovie,
+	watched,
 }) {
 	const [movie, setMovie] = useState({});
 	const [isLoading, setIsLoading] = useState(false);
@@ -11,11 +14,15 @@ export default function MovieDetails({
 
 	const isWatched = watched.find((movie) => movie.imdbID === selectedId);
 
+	const countRef = useRef(0);
+
 	useEffect(() => {
 		async function getMovieDetails() {
 			setIsLoading(true);
 			const res = await fetch(
-				`http://www.omdbapi.com/?apikey=${import.meta.env.VITE_API_KEY}&i=${selectedId}`
+				`http://www.omdbapi.com/?apikey=${
+					import.meta.env.VITE_API_KEY
+				}&i=${selectedId}`
 			);
 			const data = await res.json();
 			setMovie(data);
@@ -33,6 +40,10 @@ export default function MovieDetails({
 	}, [movie]);
 
 	useEffect(() => {
+		if (userRating) countRef.current++;
+	}, [userRating]);
+
+	useEffect(() => {
 		function callback(e) {
 			if (e.key === "Escape") {
 				onCloseMovie();
@@ -46,7 +57,16 @@ export default function MovieDetails({
 	}, [onCloseMovie]);
 
 	const {
-		Title: title, Year: year, Poster: poster, Runtime: runtime, imdbRating, Plot: plot, Released: released, Actors: actors, Director: director, Genre: genre,
+		Title: title,
+		Year: year,
+		Poster: poster,
+		Runtime: runtime,
+		imdbRating,
+		Plot: plot,
+		Released: released,
+		Actors: actors,
+		Director: director,
+		Genre: genre,
 	} = movie;
 
 	function handleAdd() {
@@ -58,6 +78,7 @@ export default function MovieDetails({
 			imdbRating: Number(imdbRating),
 			runtime: Number(runtime.split(" ")[0]),
 			userRating,
+			countRatingDecisions: countRef.current,
 		};
 		onAddWatchedMovie(newWatchedMovie);
 		onCloseMovie();
@@ -93,7 +114,8 @@ export default function MovieDetails({
 									<StarRating
 										size={24}
 										maxRating={10}
-										onSetRating={setUserRating} />
+										onSetRating={setUserRating}
+									/>
 									{userRating > 0 && (
 										<button
 											className="btn-add"
